@@ -58,7 +58,29 @@ def register():
 		flash('You are now registered and can log in','success')
 		return redirect(url_for('index'))
 	return render_template('auth/register.html', form = form)
-
+@app.route('/login', methods=['GET','POST'])
+def login():
+	if request.method == 'POST':
+		username = request.form['username']
+		password_candidate = request.form['password']
+		#cursor
+		cursor = mysql.connection.cursor()
+		result = cursor.execute("SELECT * from users where username=%s", [username])
+		if result > 0:
+			data = cursor.fetchone()
+			password = data['password']
+			if sha256_crypt.verify(password_candidate, password):
+				session.loggedin = True
+				session.username = username
+				return redirect(url_for('dashboard'))
+			else :
+				flash('Invalid Password', 'danger')
+				return render_template('auth/login.html')
+			cursor.close();
+		else:
+			flash('Invalid username', 'danger')
+			return render_template('auth/login.html')
+	return render_template('auth/login.html')
 if __name__ == '__main__':
 	app.secret_key = 'secret123'
 	app.run(debug=True)
