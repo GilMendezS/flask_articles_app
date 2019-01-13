@@ -96,7 +96,30 @@ def is_logged_in(f):
 @is_logged_in
 def dashboard():
 	return render_template('users/dashboard.html')
+class ArticleForm(Form):
+	title = StringField('Title', [validators.DataRequired(), validators.Length(min=1, max=100)])
+	body = TextAreaField('Body',[validators.Length(min=1, max=200)])
 
+@app.route('/add-article',methods=['GET','POST'])
+@is_logged_in
+def addarticle():
+	form = ArticleForm(request.form)
+	if request.method == 'POST':
+		app.logger.info(form)
+		title = form.title.data
+		body = form.body.data
+
+		#create cursor
+		cursor = mysql.connection.cursor()
+		# insert data
+		cursor.execute("INSERT INTO articles(title, body, author) values(%s,%s,%s)",(title, body, session['username']))
+		#commit db
+		mysql.connection.commit();
+		#close connection
+		cursor.close()
+		flash('Article created', 'success')
+		return redirect(url_for('dashboard'))
+	return render_template('articles/create-article.html', form = form)
 
 @app.route('/logout', methods=['POST'])
 def logout():
