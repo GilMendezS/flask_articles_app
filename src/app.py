@@ -70,8 +70,8 @@ def login():
 			data = cursor.fetchone()
 			password = data['password']
 			if sha256_crypt.verify(password_candidate, password):
-				session.loggedin = True
-				session.username = username
+				session['loggein'] = True
+				session['username'] = username
 				return redirect(url_for('dashboard'))
 			else :
 				flash('Invalid Password', 'danger')
@@ -81,6 +81,11 @@ def login():
 			flash('Invalid username', 'danger')
 			return render_template('auth/login.html')
 	return render_template('auth/login.html')
+
+@app.route('/dashboard')
+def dashboard():
+	return render_template('users/dashboard.html')
+
 if __name__ == '__main__':
 	app.secret_key = 'secret123'
 	app.run(debug=True)
