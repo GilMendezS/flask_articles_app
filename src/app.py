@@ -1,4 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
+from flask_mysqldb import MySQL
+from wtforms import Form, StringField, TextAreaField, PasswordField,validators
+from passlib.hash import sha256_crypt
 from data import Articles
 
 Articles = Articles()
@@ -17,5 +20,23 @@ def articles():
 @app.route('/articles/<string:id>')
 def article(id):
 	return render_template('article.html', id = id)
+
+class RegisterForm(Form):
+	name = StringField('Name', [validators.Length(min=1, max=50)])
+	username = StringField('Username', [validators.Length(min=5, max=50)])
+	email = StringField('Email', [validators.Length(min=6, max=50)])
+	password = PasswordField('Password', [
+		validators.DataRequired(),
+		validators.EqualTo('confirm', message="Passwords do not match")
+	])
+	confirm = PasswordField('Confirm Password')
+@app.route('/register', methods=['GET','POST'])
+def register():
+	form = RegisterForm()
+	if request.method == 'POST' and form.validate():
+		pass
+
+	return render_template('auth/register.html', form = form)
+
 if __name__ == '__main__':
 	app.run(debug=True)
