@@ -95,7 +95,11 @@ def is_logged_in(f):
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
-	return render_template('users/dashboard.html')
+	cursor = mysql.connection.cursor()
+	articles = cursor.execute("SELECT * FROM articles")
+	articles = cursor.fetchall()
+	cursor.close()
+	return render_template('users/dashboard.html', articles = articles)
 class ArticleForm(Form):
 	title = StringField('Title', [validators.DataRequired(), validators.Length(min=1, max=100)])
 	body = TextAreaField('Body',[validators.Length(min=1, max=200)])
