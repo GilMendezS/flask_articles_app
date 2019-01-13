@@ -3,7 +3,7 @@ from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField,validators
 from passlib.hash import sha256_crypt
 from functools import wraps
-from data import Articles
+
 
 app = Flask(__name__)
 # Config Mysql
@@ -15,7 +15,7 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 # Initialize Mysql
 mysql = MySQL(app)
 
-Articles = Articles()
+
 
 @app.route('/')
 def index():
@@ -26,7 +26,11 @@ def about():
 	return render_template('about.html')
 @app.route('/articles')
 def articles():
-	return render_template('articles.html', articles = Articles)
+	cursor = mysql.connection.cursor()
+	articles = cursor.execute("SELECT * FROM articles")
+	articles = cursor.fetchall()
+	cursor.close()
+	return render_template('articles.html', articles = articles)
 @app.route('/articles/<string:id>')
 def article(id):
 	return render_template('article.html', id = id)
