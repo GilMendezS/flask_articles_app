@@ -2,6 +2,7 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField,validators
 from passlib.hash import sha256_crypt
+from functools import wraps
 from data import Articles
 
 app = Flask(__name__)
@@ -81,10 +82,22 @@ def login():
 			flash('Invalid username', 'danger')
 			return render_template('auth/login.html')
 	return render_template('auth/login.html')
+def is_logged_in(f):
+	@wraps(f)
+	def wrap(*args, **kwargs):
+		if 'loggedin' in session:
+			return f(*args, **kwargs)
+		else:
+			flash('Unauthorized, please login', 'danger')
+			return redirect(url_for('login'))
+	return wrap
 
 @app.route('/dashboard')
+@is_logged_in
 def dashboard():
 	return render_template('users/dashboard.html')
+
+
 @app.route('/logout', methods=['POST'])
 def logout():
 	if request.method == 'POST':
