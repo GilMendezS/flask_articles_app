@@ -16,10 +16,30 @@
         <li><a href="/articles">Articles</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li>
-          <a href="/register">Register</a>
-        </li>
+        {% if session.loggedin %}
+          <li>  
+            <a href="/dashboard">Dashboard</a>
+          </li>
+          <li>
+            <a href="#" onclick="logout()">Logout</a>
+            <form action="/logout" method="POST" id="logoutForm">
+            </form>
+          </li>
+        {% else %}
+          <li>
+            <a href="/login">Login</a>
+          </li>
+          <li>
+            <a href="/register">Register</a>
+          </li>
+        {% endif %}
+        
       </ul>
     </div><!--/.nav-collapse -->
   </div>
 </nav>
+<script>
+  function logout(){
+    document.getElementById('logoutForm').submit(); 
+  }
+</script>
