@@ -33,7 +33,11 @@ def articles():
 	return render_template('articles.html', articles = articles)
 @app.route('/articles/<string:id>')
 def article(id):
-	return render_template('article.html', id = id)
+	cursor = mysql.connection.cursor()
+	article = cursor.execute("SELECT * FROM articles where id = %s", [id])
+	article = cursor.fetchone()
+	cursor.close()
+	return render_template('article.html', article = article)
 
 class RegisterForm(Form):
 	name = StringField('Name', [validators.Length(min=1, max=50)])

@@ -1,5 +1,8 @@
 {% extends 'layouts/master.html' %}
 
 {% block body %}
-	{{id}}
+	<h2>{{article.title}} <small>Created by: {{article.author}} - {{article.create_date}}</small> </h2>
+	<p class="lead">
+		{{article.body | safe}}
+	</p>
 {% endblock %}
